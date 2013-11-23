@@ -5,6 +5,9 @@
 
 #include <string>
 
-GLuint loadImage(const string& path);
+GLuint loadImage(const std::string& path);
+
+int getCurrentTextureWidth();
+int getCurrentTextureHeight();
 
 #endif

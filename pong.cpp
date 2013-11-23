@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <random>
 
+#include "image.h"
+
 using std::string;
 using std::abs;
 using std::stringstream;
@@ -62,10 +64,15 @@ object ball = {{0.5, 0.6}, {0.01, 0.01}, {0.008, 0.}, {1., 1., 1.}};
 
 int leftScore = 0, rightScore = 0;
 
+GLuint backgroundTexture;
+
 void init() {
 	glEnable(GL_DEPTH_TEST);
-	glEnable (GL_BLEND); 
+	glEnable(GL_BLEND); 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_TEXTURE_2D);
+	
+	backgroundTexture = loadImage("Neon-Variant.png");
 }
 
 float signum(float x) {
@@ -146,7 +153,7 @@ void movementLogic() {
 		ball.vel.x = ball.intersects(leftPaddle) ? 0.01 : -0.01;
 		float vel = (ball.intersects(leftPaddle) ? leftPaddle : rightPaddle).vel.y;
 		float ydiff = (ball.intersects(leftPaddle) ? leftPaddle : rightPaddle).pos.y - ball.pos.y;
-		ball.vel.y += 0.25 * vel + 0.03 * ydiff;
+		ball.vel.y += 0.25 * vel - 0.07 * ydiff;
 	}
 	
 	bool restart = false;
@@ -197,6 +204,16 @@ void displayScores(int leftScore, int rightScore) {
 	//m_viewport[2] is the x width of the viewport somehow
 	glRasterPos2f(1 - (float)stringWidth(font, rightScoreStr)/(float)m_viewport[2], 0);
 	glutBitmapString(font, reinterpret_cast<const unsigned char*>(rightScoreStr.c_str()));
+	
+	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+	glBegin(GL_QUADS);
+	glTexCoord2i(0, 0); glVertex2i(0, 0);
+	glTexCoord2i(0, 1); glVertex2i(0, 1);
+	glTexCoord2i(1, 1); glVertex2i(1, 1);
+	glTexCoord2i(1, 0); glVertex2i(1, 0);
+	glEnd();
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void display() {
@@ -221,6 +238,15 @@ void reshape(int w, int h) {
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, 1, 0, 1);
+	
+	glMatrixMode(GL_TEXTURE);
+	glLoadIdentity();
+	float multMatrix[16] =
+	{1, 0, 0, 0,
+		0, -1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1};
+	glMultMatrixf(multMatrix);
 	
 	glMatrixMode(GL_MODELVIEW);
 }
