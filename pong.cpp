@@ -10,6 +10,9 @@
 #include <random>
 
 #include "image.h"
+#include "pong.h"
+#include "util.h"
+#include "PaddleBehavior.h"
 
 using std::string;
 using std::abs;
@@ -23,40 +26,32 @@ string toString(const T& t) {
 	return s.str();
 }
 
+bool object::contains(float x, float y) const {
+	bool xContains = abs(x - pos.x) < dim.x/2.f;
+	bool yContains = abs(y - pos.y) < dim.y/2.f;
+	return xContains && yContains;
+}
+
+// doesn't work with complex intersections, but don't need those here.
+bool object::intersects(const object& o) const {
+	return o.contains(pos.x + dim.x/2., pos.y + dim.y/2.) ||
+	o.contains(pos.x + dim.x/2., pos.y - dim.y/2.) ||
+	o.contains(pos.x - dim.x/2., pos.y - dim.y/2.) ||
+	o.contains(pos.x - dim.x/2., pos.y + dim.y/2.);
+}
+
+bool object::inBounds() const {
+	return pos.y - dim.y/2.f > 0.f &&
+		pos.y + dim.y/2.f < 1.f &&
+		pos.x - dim.x/2.f > 0.f &&
+		pos.x + dim.x/2.f < 1.f;
+}
+
 bool keyboardState[256];
 bool keyboardSpecialState[256];
 std::random_device rd;
 std::mt19937 randomgen(rd());
 std::uniform_real_distribution<float> distr(-.005,.005);
-
-struct object {
-	struct {
-		float x, y;
-	} pos;
-	struct {
-		float x, y;
-	} dim;
-	struct {
-		float x, y;
-	} vel;
-	struct {
-		float r, g, b;
-	} color;
-	
-	bool contains(float x, float y) const {
-		bool xContains = abs(x - pos.x) < dim.x/2.f;
-		bool yContains = abs(y - pos.y) < dim.y/2.f;
-		return xContains && yContains;
-	}
-	
-	// doesn't work with complex intersections, but don't need those here.
-	bool intersects(const object& o) const {
-		return o.contains(pos.x + dim.x/2., pos.y + dim.y/2.) ||
-			o.contains(pos.x + dim.x/2., pos.y - dim.y/2.) ||
-			o.contains(pos.x - dim.x/2., pos.y - dim.y/2.) ||
-			o.contains(pos.x - dim.x/2., pos.y + dim.y/2.);
-	}
-};
 
 object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}};
 object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}};
@@ -75,16 +70,6 @@ void init() {
 	backgroundTexture = loadImage("Neon-Variant.png");
 }
 
-float signum(float x) {
-	if(x < 0) {
-		return -1;
-	} else if(x == 0) {
-		return 0;
-	} else {
-		return 1;
-	}
-}
-
 float limit(float x, float min, float max) {
 	if(x < min) {
 		return min;
@@ -95,7 +80,8 @@ float limit(float x, float min, float max) {
 	}
 }
 
-float dash = 0;
+PaddleBehavior* leftPaddleBehavior = new JumpPaddle(leftPaddle, 0.01, 0.06);
+PaddleBehavior* rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
 
 void movementLogic() {
 	ball.pos.x += ball.vel.x;
@@ -104,6 +90,9 @@ void movementLogic() {
 	float leftSpeed = 0.01;
 	float dashSpeed = 0.06;
 	
+	leftPaddleBehavior->doMovement(keyboardState);
+	
+	/*
 	if(dash > .2) {
 		
 	} else if(dash > 0) {
@@ -126,24 +115,22 @@ void movementLogic() {
 		}
 	}
 	
-	dash -= 0.01;
+	dash -= 0.01;*/
 	
-	if(rightPaddle.pos.y > ball.pos.y) {
-		rightPaddle.vel.y = -0.014;
-	}
-	else if(rightPaddle.pos.y < ball.pos.y) {
-		float aiSpeed = 0.014;
-		if(abs(rightPaddle.pos.y - ball.pos.y) < aiSpeed) {
-			rightPaddle.vel.y = ball.pos.y - rightPaddle.pos.y;
-		} else {
-			rightPaddle.vel.y = aiSpeed;
-		}
-	} else {
-		rightPaddle.vel.y = 0;
-	}
+	rightPaddleBehavior->doAI(ball);
 	
+	object oldLeftPaddle = leftPaddle;
 	leftPaddle.pos.y += leftPaddle.vel.y;
+	if(!leftPaddle.inBounds()) {
+		leftPaddle = oldLeftPaddle;
+	}
+	
+	object oldRightPaddle = rightPaddle;
 	rightPaddle.pos.y += rightPaddle.vel.y;
+	if(!rightPaddle.inBounds()) {
+		rightPaddle = oldRightPaddle;
+	}
+	
 	
 	if(ball.pos.y >= 1 || ball.pos.y <= 0) {
 		ball.vel.y *= -1.f;
