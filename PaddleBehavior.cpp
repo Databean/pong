@@ -2,6 +2,8 @@
 
 #include <cmath>
 
+#include <iostream>
+
 #include "util.h"
 
 using std::abs;
@@ -112,11 +114,14 @@ void JumpPaddle::doAI(const object& ball) {
 				ballY += ballVel;
 				paddleY += (ballY > paddleY ? speed : -speed);
 			}
-			if(abs(paddleY - ballY) > paddle.dim.y / 2.f) {
+			float time = (paddle.pos.x - ball.pos.x) / ball.vel.x;
+			float dashNowY = paddleY + (ballY > paddleY ? dashSpeed : -dashSpeed) * time;
+			
+			if(abs(paddleY - ballY) > paddle.dim.y / 2.f && abs(dashNowY - ballY) < paddle.dim.y / 2.f) {
 				shouldDash = true;
 			}
 		}
-		if(shouldDash && abs(paddle.pos.x - ball.pos.x) < 0.1) {
+		if(shouldDash && abs(paddle.pos.x - ball.pos.x) < 0.06) {
 			int dir = -signum(paddle.pos.y - ball.pos.y);
 			dash = 0.26;
 			paddle.vel.y = dashSpeed * dir;
