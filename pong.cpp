@@ -5,26 +5,18 @@
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <sstream>
 #include <algorithm>
-#include <random>
 
 #include "image.h"
 #include "pong.h"
 #include "util.h"
 #include "PaddleBehavior.h"
+#include "game.h"
 
 using std::string;
 using std::abs;
 using std::stringstream;
 using std::for_each;
-
-template<class T>
-string toString(const T& t) {
-	stringstream s;
-	s << t;
-	return s.str();
-}
 
 bool object::contains(float x, float y) const {
 	bool xContains = abs(x - pos.x) < dim.x/2.f;
@@ -49,15 +41,6 @@ bool object::inBounds() const {
 
 bool keyboardState[256];
 bool keyboardSpecialState[256];
-std::random_device rd;
-std::mt19937 randomgen(rd());
-std::uniform_real_distribution<float> distr(-.005,.005);
-
-object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}};
-object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}};
-object ball = {{0.5, 0.6}, {0.01, 0.01}, {0.008, 0.}, {1., 1., 1.}};
-
-int leftScore = 0, rightScore = 0;
 
 GLuint backgroundTexture;
 
@@ -67,100 +50,12 @@ void init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
 	
-	backgroundTexture = loadImage("Neon-Variant.png");
-}
-
-float limit(float x, float min, float max) {
-	if(x < min) {
-		return min;
-	} else if(x > max) {
-		return max;
-	} else {
-		return x;
-	}
-}
-
-PaddleBehavior* leftPaddleBehavior = new JumpPaddle(leftPaddle, 0.01, 0.06);
-PaddleBehavior* rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
-
-void movementLogic() {
-	ball.pos.x += ball.vel.x;
-	ball.pos.y += ball.vel.y;
-	
-	float leftSpeed = 0.01;
-	float dashSpeed = 0.06;
-	
-	leftPaddleBehavior->doMovement(keyboardState);
-	
-	/*
-	if(dash > .2) {
-		
-	} else if(dash > 0) {
-		leftPaddle.vel.y = 0;
-	} else {
-		leftPaddle.vel.y = 0;
-		if(keyboardState['s'] && leftPaddle.pos.y - leftPaddle.dim.y/2.f > 0.f) {
-			leftPaddle.vel.y = -leftSpeed;
-		}
-		else if(keyboardState['w'] && leftPaddle.pos.y + leftPaddle.dim.y/2.f < 1.f) {
-			leftPaddle.vel.y = leftSpeed;
-		} else {
-			leftPaddle.vel.y = 0;
-		}
-		
-		if(keyboardState[' ']) {
-			int dir = signum(leftPaddle.vel.y);
-			dash = 0.26;
-			leftPaddle.vel.y = dashSpeed * dir;
-		}
-	}
-	
-	dash -= 0.01;*/
-	
-	rightPaddleBehavior->doAI(ball);
-	
-	object oldLeftPaddle = leftPaddle;
-	leftPaddle.pos.y += leftPaddle.vel.y;
-	if(!leftPaddle.inBounds()) {
-		leftPaddle = oldLeftPaddle;
-	}
-	
-	object oldRightPaddle = rightPaddle;
-	rightPaddle.pos.y += rightPaddle.vel.y;
-	if(!rightPaddle.inBounds()) {
-		rightPaddle = oldRightPaddle;
-	}
-	
-	
-	if(ball.pos.y >= 1 || ball.pos.y <= 0) {
-		ball.vel.y *= -1.f;
-	}
-	
-	if(ball.intersects(leftPaddle) || ball.intersects(rightPaddle)) {
-		ball.vel.x = ball.intersects(leftPaddle) ? 0.01 : -0.01;
-		float vel = (ball.intersects(leftPaddle) ? leftPaddle : rightPaddle).vel.y;
-		float ydiff = (ball.intersects(leftPaddle) ? leftPaddle : rightPaddle).pos.y - ball.pos.y;
-		ball.vel.y += 0.25 * vel - 0.07 * ydiff;
-	}
-	
-	bool restart = false;
-	if(ball.pos.x < -.2) {
-		rightScore++;
-		restart = true;
-	}
-	if(ball.pos.x > 1.2) {
-		leftScore++;
-		restart = true;
-	}
-	if(restart) {
-		ball.pos.x = 0.5;
-		ball.pos.y = 0.5;
-		ball.vel.y = distr(randomgen);
-	}
+	backgroundTexture = loadImage("resources/NeonVariant.png");
 }
 
 void displayObject(const object& o) {
 	glColor3f(o.color.r, o.color.g, o.color.b);
+	glBindTexture(GL_TEXTURE_2D, o.texture);
 	glBegin(GL_QUADS); {
 		glVertex2f(o.pos.x - o.dim.x/2.f, o.pos.y - o.dim.y/2.f);
 		glVertex2f(o.pos.x + o.dim.x/2.f, o.pos.y - o.dim.y/2.f);
@@ -169,28 +64,13 @@ void displayObject(const object& o) {
 	} glEnd();
 }
 
-/**
- * Uses glutBitmapWidth to find the width (in pixels) of some bitmap font.
- */
-int stringWidth(void* font, const string& text) {
-	int size = 0;
-	for_each(text.begin(), text.end(), [font, &size](char c) { size += glutBitmapWidth(font, c); });
-	return size;
-}
-
-void displayScores(int leftScore, int rightScore) {
-	string leftScoreStr = toString(leftScore), rightScoreStr = toString(rightScore);
-	auto font = GLUT_BITMAP_HELVETICA_18;
+void display() {
+	//Clear screen
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glRasterPos2f(0, 0);
-	glutBitmapString(font, reinterpret_cast<const unsigned char*>(leftScoreStr.c_str()));
-	
-	GLint m_viewport[4];
-	glGetIntegerv(GL_VIEWPORT, m_viewport);
-	
-	//m_viewport[2] is the x width of the viewport somehow
-	glRasterPos2f(1 - (float)stringWidth(font, rightScoreStr)/(float)m_viewport[2], 0);
-	glutBitmapString(font, reinterpret_cast<const unsigned char*>(rightScoreStr.c_str()));
+	movementLogic(keyboardState);
+	drawGame();
 	
 	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 	glBegin(GL_QUADS);
@@ -201,19 +81,6 @@ void displayScores(int leftScore, int rightScore) {
 	glEnd();
 	
 	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void display() {
-	//Clear screen
-	glClearColor(0.0, 0.0, 0.0, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	displayObject(leftPaddle);
-	displayObject(rightPaddle);
-	displayObject(ball);
-	displayScores(leftScore, rightScore);
-	
-	movementLogic();
 	
 	glutSwapBuffers();
 	glFlush ();

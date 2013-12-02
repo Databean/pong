@@ -1,6 +1,8 @@
 #ifndef PONG_H
 #define PONG_H
 
+#include <GL/gl.h>
+
 #include <cmath>
 
 struct object {
@@ -16,6 +18,7 @@ struct object {
 	struct {
 		float r, g, b;
 	} color;
+	GLuint texture;
 	
 	bool contains(float x, float y) const;
 	
@@ -24,5 +27,7 @@ struct object {
 	
 	bool inBounds() const;
 };
+
+void displayObject(const object&);
 
 #endif

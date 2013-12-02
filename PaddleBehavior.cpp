@@ -56,16 +56,6 @@ JumpPaddle::~JumpPaddle() {
 	
 }
 
-float signum(float x) {
-	if(x < 0) {
-		return -1;
-	} else if(x == 0) {
-		return 0;
-	} else {
-		return 1;
-	}
-}
-
 void JumpPaddle::doMovement(bool keyboardState[256]) {
 	if(dash > .2) {
 		if(paddle.pos.y - paddle.dim.y/2.f > 0.f) {}
