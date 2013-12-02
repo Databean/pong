@@ -10,6 +10,7 @@
 
 #include "game.h"
 #include "PaddleBehavior.h"
+#include "image.h"
 
 using std::stringstream;
 using std::string;
@@ -17,6 +18,8 @@ using std::string;
 std::random_device rd;
 std::mt19937 randomgen(rd());
 std::uniform_real_distribution<float> distr(-.005,.005);
+
+GLuint backgroundTexture;
 
 object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}, 0};
 object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}, 0};
@@ -43,6 +46,10 @@ float limit(float x, float min, float max) {
 
 PaddleBehavior* leftPaddleBehavior = new JumpPaddle(leftPaddle, 0.01, 0.06);
 PaddleBehavior* rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
+
+void initGame() {
+	backgroundTexture = loadImage("resources/NeonVariant.png");
+}
 
 void movementLogic(bool keyboardState[256]) {
 	ball.pos.x += ball.vel.x;
@@ -121,4 +128,14 @@ void drawGame() {
 	displayObject(rightPaddle);
 	displayObject(ball);
 	displayScores(leftScore, rightScore);
+	
+	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
+	glBegin(GL_QUADS);
+	glTexCoord2i(0, 0); glVertex2i(0, 0);
+	glTexCoord2i(0, 1); glVertex2i(0, 1);
+	glTexCoord2i(1, 1); glVertex2i(1, 1);
+	glTexCoord2i(1, 0); glVertex2i(1, 0);
+	glEnd();
+	
+	glBindTexture(GL_TEXTURE_2D, 0);
 }

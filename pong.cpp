@@ -12,6 +12,7 @@
 #include "util.h"
 #include "PaddleBehavior.h"
 #include "game.h"
+#include "menu.h"
 
 using std::string;
 using std::abs;
@@ -42,7 +43,7 @@ bool object::inBounds() const {
 bool keyboardState[256];
 bool keyboardSpecialState[256];
 
-GLuint backgroundTexture;
+
 
 void init() {
 	glEnable(GL_DEPTH_TEST);
@@ -50,7 +51,8 @@ void init() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
 	
-	backgroundTexture = loadImage("resources/NeonVariant.png");
+	initGame();
+	initMenu();
 }
 
 void displayObject(const object& o) {
@@ -69,18 +71,10 @@ void display() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	movementLogic(keyboardState);
-	drawGame();
+	//movementLogic(keyboardState);
+	//drawGame();
 	
-	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
-	glBegin(GL_QUADS);
-	glTexCoord2i(0, 0); glVertex2i(0, 0);
-	glTexCoord2i(0, 1); glVertex2i(0, 1);
-	glTexCoord2i(1, 1); glVertex2i(1, 1);
-	glTexCoord2i(1, 0); glVertex2i(1, 0);
-	glEnd();
-	
-	glBindTexture(GL_TEXTURE_2D, 0);
+	drawMenu(keyboardState);
 	
 	glutSwapBuffers();
 	glFlush ();
