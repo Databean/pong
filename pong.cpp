@@ -59,10 +59,10 @@ void displayObject(const object& o) {
 	glColor3f(o.color.r, o.color.g, o.color.b);
 	glBindTexture(GL_TEXTURE_2D, o.texture);
 	glBegin(GL_QUADS); {
-		glVertex2f(o.pos.x - o.dim.x/2.f, o.pos.y - o.dim.y/2.f);
-		glVertex2f(o.pos.x + o.dim.x/2.f, o.pos.y - o.dim.y/2.f);
-		glVertex2f(o.pos.x + o.dim.x/2.f, o.pos.y + o.dim.y/2.f);
-		glVertex2f(o.pos.x - o.dim.x/2.f, o.pos.y + o.dim.y/2.f);
+		glTexCoord2i(0, 0); glVertex2f(o.pos.x - o.dim.x/2.f, o.pos.y - o.dim.y/2.f);
+		glTexCoord2i(1, 0); glVertex2f(o.pos.x + o.dim.x/2.f, o.pos.y - o.dim.y/2.f);
+		glTexCoord2i(1, 1); glVertex2f(o.pos.x + o.dim.x/2.f, o.pos.y + o.dim.y/2.f);
+		glTexCoord2i(0, 1); glVertex2f(o.pos.x - o.dim.x/2.f, o.pos.y + o.dim.y/2.f);
 	} glEnd();
 }
 
