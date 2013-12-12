@@ -12,6 +12,11 @@ GLuint optionTexture;
 GLuint optionSelectedTexture;
 
 object bgObject = {{0.5, 0.5}, {1, 1}, {0, 0}, {1, 1, 1}, menuTexture};
+object playButton = {{0.5, 0.6}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, playTexture};
+object modeButton = {{0.5, 0.4}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, modeTexture};
+object optionButton = {{0.5, 0.2}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, optionTexture};
+
+int selected = 0;
 
 void initMenu() {
 	menuTexture = loadImage("resources/Menu.png");
@@ -23,9 +28,31 @@ void initMenu() {
 	optionSelectedTexture = loadImage("resources/Option selected.png");
 	
 	bgObject.texture = menuTexture;
+	playButton.texture = playTexture;
+	modeButton.texture = modeTexture;
+	optionButton.texture = optionTexture;
 }
 
 void drawMenu(bool keyboardState[256]) {
 	
+	static bool previousUp, previousDown;
+	
+	if(keyboardState['w'] && !previousUp) {
+		selected = (selected + 3 - 1) % 3;
+	}
+	if(keyboardState['s'] && ! previousDown) {
+		selected = (selected + 1) % 3;
+	}
+	
+	previousUp = keyboardState['w'];
+	previousDown = keyboardState['s'];
+	
+	playButton.texture = selected == 0 ? playSelectedTexture : playTexture;
+	modeButton.texture = selected == 1 ? modeSelectedTexture : modeTexture;
+	optionButton.texture = selected == 2 ? optionSelectedTexture : optionTexture;
+	
 	displayObject(bgObject);
+	displayObject(playButton);
+	displayObject(modeButton);
+	displayObject(optionButton);
 }

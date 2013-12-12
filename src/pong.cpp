@@ -46,7 +46,7 @@ bool keyboardSpecialState[256];
 
 
 void init() {
-	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_NEVER);
 	glEnable(GL_BLEND); 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
