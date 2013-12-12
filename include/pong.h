@@ -30,4 +30,7 @@ struct object {
 
 void displayObject(const object&);
 
+void showGame();
+void showMenu();
+
 #endif

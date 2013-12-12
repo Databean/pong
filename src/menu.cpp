@@ -55,4 +55,8 @@ void drawMenu(bool keyboardState[256]) {
 	displayObject(playButton);
 	displayObject(modeButton);
 	displayObject(optionButton);
+	
+	if(selected == 0 && keyboardState[' ']) {
+		showGame();
+	}
 }

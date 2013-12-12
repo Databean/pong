@@ -124,10 +124,7 @@ void displayScores(int leftScore, int rightScore) {
 }
 
 void drawGame() {
-	displayObject(leftPaddle);
-	displayObject(rightPaddle);
-	displayObject(ball);
-	displayScores(leftScore, rightScore);
+	
 	
 	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 	glBegin(GL_QUADS);
@@ -136,6 +133,11 @@ void drawGame() {
 	glTexCoord2i(1, 1); glVertex2i(1, 1);
 	glTexCoord2i(1, 0); glVertex2i(1, 0);
 	glEnd();
-	
 	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	
+	displayObject(leftPaddle);
+	displayObject(rightPaddle);
+	displayObject(ball);
+	displayScores(leftScore, rightScore);
 }

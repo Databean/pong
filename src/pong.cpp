@@ -43,7 +43,15 @@ bool object::inBounds() const {
 bool keyboardState[256];
 bool keyboardSpecialState[256];
 
+bool inGame = false;
 
+void showGame() {
+	inGame = true;
+}
+
+void showMenu() {
+	inGame = false;
+}
 
 void init() {
 	glDepthFunc(GL_NEVER);
@@ -71,10 +79,12 @@ void display() {
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	//movementLogic(keyboardState);
-	//drawGame();
-	
-	drawMenu(keyboardState);
+	if(inGame) {
+		movementLogic(keyboardState);
+		drawGame();
+	} else {
+		drawMenu(keyboardState);
+	}
 	
 	glutSwapBuffers();
 	glFlush ();
