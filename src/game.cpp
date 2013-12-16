@@ -20,6 +20,7 @@ std::mt19937 randomgen(rd());
 std::uniform_real_distribution<float> distr(-.005,.005);
 
 GLuint backgroundTexture;
+GLuint numberTextures[10];
 
 object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}, 0};
 object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}, 0};
@@ -49,6 +50,9 @@ PaddleBehavior* rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
 
 void initGame() {
 	backgroundTexture = loadImage("resources/NeonVariant.png");
+	for(int i = 0; i < 10; i++) {
+		numberTextures[i] = loadImage("resources/" + toString(i) + ".png");
+	}
 }
 
 void movementLogic(bool keyboardState[256]) {
@@ -99,28 +103,45 @@ void movementLogic(bool keyboardState[256]) {
 	}
 }
 
-/**
- * Uses glutBitmapWidth to find the width (in pixels) of some bitmap font.
- */
-int stringWidth(void* font, const string& text) {
+int stringWidth(const string& text) {
 	int size = 0;
-	for_each(text.begin(), text.end(), [font, &size](char c) { size += glutBitmapWidth(font, c); });
+	for_each(text.begin(), text.end(), [&size](char c) { if('0' <= c && c <= '9') { size += 20; } });
 	return size;
+}
+
+void drawScore(float x, float y, string& text) {
+	GLint m_viewport[4];
+	glGetIntegerv(GL_VIEWPORT, m_viewport);
+	float width = (float)m_viewport[2];
+	float height = (float)m_viewport[3];
+	for(const char& c : text) {
+		if('0' <= c && c <= '9') {
+			GLuint num = numberTextures[c - '0'];
+			
+			glBindTexture(GL_TEXTURE_2D, num);
+			glBegin(GL_QUADS);
+			glTexCoord2i(0, 0); glVertex2f(x, y);
+			glTexCoord2i(1, 0); glVertex2f(x + 50/width, y);
+			glTexCoord2i(1, 1); glVertex2f(x + 50/width, y + 50/height);
+			glTexCoord2i(0, 1); glVertex2f(x, y + 50/height);
+			glEnd();
+			glBindTexture(GL_TEXTURE_2D, 0);
+			
+			x += 20/width;
+		}
+	}
 }
 
 void displayScores(int leftScore, int rightScore) {
 	string leftScoreStr = toString(leftScore), rightScoreStr = toString(rightScore);
-	auto font = GLUT_BITMAP_HELVETICA_18;
-	
-	glRasterPos2f(0, 0);
-	glutBitmapString(font, reinterpret_cast<const unsigned char*>(leftScoreStr.c_str()));
-	
-	GLint m_viewport[4];
-	glGetIntegerv(GL_VIEWPORT, m_viewport);
 	
 	//m_viewport[2] is the x width of the viewport somehow
-	glRasterPos2f(1 - (float)stringWidth(font, rightScoreStr)/(float)m_viewport[2], 0);
-	glutBitmapString(font, reinterpret_cast<const unsigned char*>(rightScoreStr.c_str()));
+	GLint m_viewport[4];
+	glGetIntegerv(GL_VIEWPORT, m_viewport);
+	float width = (float)m_viewport[2];
+	
+	drawScore(0, 0, leftScoreStr);
+	drawScore(1 - 20/width - (float)stringWidth(rightScoreStr)/width, 0, rightScoreStr);
 }
 
 void drawGame() {
