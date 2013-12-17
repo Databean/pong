@@ -6,6 +6,7 @@
 #include <random>
 #include <algorithm>
 #include <sstream>
+#include <ctime>
 
 #include "game.h"
 #include "PaddleBehavior.h"
@@ -23,9 +24,15 @@ GLuint numberTextures[10];
 
 object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}, 0};
 object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}, 0};
-object ball = {{0.5, 0.6}, {0.01, 0.01}, {0.008, 0.}, {1., 1., 1.}, 0};
+object ball = {{0.5, 0.5}, {0.01, 0.01}, {0.008, 0.}, {1., 1., 1.}, 0};
+
+std::clock_t ballDelay = std::clock();
 
 int leftScore = 0, rightScore = 0;
+
+void newGame() {
+	leftScore = rightScore = 0;
+}
 
 template<class T>
 string toString(const T& t) {
@@ -55,8 +62,10 @@ void initGame() {
 }
 
 void movementLogic(bool keyboardState[256]) {
-	ball.pos.x += ball.vel.x;
-	ball.pos.y += ball.vel.y;
+	if(std::clock() > ballDelay) {
+		ball.pos.x += ball.vel.x;
+		ball.pos.y += ball.vel.y;
+	}
 	
 	leftPaddleBehavior->doMovement(keyboardState);
 	
@@ -108,6 +117,7 @@ void movementLogic(bool keyboardState[256]) {
 		ball.pos.x = 0.5;
 		ball.pos.y = 0.5;
 		ball.vel.y = distr(randomgen);
+		ballDelay = std::clock() + CLOCKS_PER_SEC;
 	}
 }
 
