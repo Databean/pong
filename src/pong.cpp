@@ -75,19 +75,18 @@ void displayObject(const object& o) {
 	} glEnd();
 }
 
+double lastFrame = getWallTime();
+
 void display() {
-	
-	static std::clock_t lastFrame = std::clock();
 	
 	//Clear screen
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if(inGame) {
-		if(std::clock() - lastFrame >= CLOCKS_PER_SEC / 65) {
-			//std::cout << std::clock() - lastFrame << " " << CLOCKS_PER_SEC << std::endl;
+		if(getWallTime() - lastFrame >= 1.0 / 65) {
 			movementLogic(keyboardState);
-			lastFrame = std::clock();
+			lastFrame += 1.0/65.;
 		}
 		drawGame();
 	} else {

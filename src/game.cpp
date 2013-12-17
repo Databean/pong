@@ -11,6 +11,7 @@
 #include "game.h"
 #include "PaddleBehavior.h"
 #include "image.h"
+#include "util.h"
 
 using std::stringstream;
 using std::string;
@@ -26,7 +27,7 @@ object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}, 0};
 object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}, 0};
 object ball = {{0.5, 0.5}, {0.01, 0.01}, {0.008, 0.}, {1., 1., 1.}, 0};
 
-std::clock_t ballDelay = std::clock();
+double ballDelay = getWallTime();
 
 int leftScore = 0, rightScore = 0;
 
@@ -62,7 +63,7 @@ void initGame() {
 }
 
 void movementLogic(bool keyboardState[256]) {
-	if(std::clock() > ballDelay) {
+	if(getWallTime() > ballDelay) {
 		ball.pos.x += ball.vel.x;
 		ball.pos.y += ball.vel.y;
 	}
@@ -117,7 +118,7 @@ void movementLogic(bool keyboardState[256]) {
 		ball.pos.x = 0.5;
 		ball.pos.y = 0.5;
 		ball.vel.y = distr(randomgen);
-		ballDelay = std::clock() + CLOCKS_PER_SEC * 3 / 4;
+		ballDelay = getWallTime() + 0.75;
 	}
 }
 

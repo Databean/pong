@@ -3,4 +3,6 @@
 
 float signum(float x);
 
+double getWallTime();
+
 #endif
