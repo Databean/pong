@@ -117,7 +117,7 @@ void movementLogic(bool keyboardState[256]) {
 		ball.pos.x = 0.5;
 		ball.pos.y = 0.5;
 		ball.vel.y = distr(randomgen);
-		ballDelay = std::clock() + CLOCKS_PER_SEC;
+		ballDelay = std::clock() + CLOCKS_PER_SEC * 3 / 4;
 	}
 }
 
