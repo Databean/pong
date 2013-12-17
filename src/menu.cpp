@@ -12,9 +12,9 @@ GLuint optionTexture;
 GLuint optionSelectedTexture;
 
 object bgObject = {{0.5, 0.5}, {1, 1}, {0, 0}, {1, 1, 1}, menuTexture};
-object playButton = {{0.5, 0.6}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, playTexture};
-object modeButton = {{0.5, 0.4}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, modeTexture};
-object optionButton = {{0.5, 0.2}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, optionTexture};
+object playButton = {{175/1280., 0.6}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, playTexture};
+object modeButton = {{175/1280., 0.4}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, modeTexture};
+object optionButton = {{175/1280., 0.2}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, optionTexture};
 
 int selected = 0;
 

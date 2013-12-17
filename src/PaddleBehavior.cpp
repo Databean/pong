@@ -76,7 +76,7 @@ void JumpPaddle::doMovement(bool keyboardState[256]) {
 			paddle.vel.y = 0;
 		}
 		
-		if(keyboardState[' ']) {
+		if(keyboardState[' '] && signum(paddle.vel.y) != 0) {
 			int dir = signum(paddle.vel.y);
 			dash = 0.26;
 			paddle.vel.y = dashSpeed * dir;

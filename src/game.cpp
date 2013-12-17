@@ -1,7 +1,6 @@
 #include "pong.h"
 
 #include <GL/gl.h>
-#include <GL/freeglut.h>
 
 #include <string>
 #include <random>
@@ -15,7 +14,7 @@
 using std::stringstream;
 using std::string;
 
-std::random_device rd;
+std::mt19937 rd;
 std::mt19937 randomgen(rd());
 std::uniform_real_distribution<float> distr(-.005,.005);
 

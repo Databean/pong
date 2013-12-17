@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <ctime>
 #include <algorithm>
 
 #include "image.h"
@@ -75,12 +76,19 @@ void displayObject(const object& o) {
 }
 
 void display() {
+	
+	static std::clock_t lastFrame = std::clock();
+	
 	//Clear screen
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	if(inGame) {
-		movementLogic(keyboardState);
+		if(std::clock() - lastFrame >= CLOCKS_PER_SEC / 65) {
+			//std::cout << std::clock() - lastFrame << " " << CLOCKS_PER_SEC << std::endl;
+			movementLogic(keyboardState);
+			lastFrame = std::clock();
+		}
 		drawGame();
 	} else {
 		drawMenu(keyboardState);
