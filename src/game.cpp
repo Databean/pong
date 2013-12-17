@@ -67,14 +67,23 @@ void movementLogic(bool keyboardState[256]) {
 	leftPaddle.pos.y += leftPaddle.vel.y;
 	if(!leftPaddle.inBounds()) {
 		leftPaddle = oldLeftPaddle;
+		if(leftPaddle.pos.y < 0.5) {
+			leftPaddle.pos.y = leftPaddle.dim.y / 2.;
+		} else {
+			leftPaddle.pos.y = 1. - leftPaddle.dim.y / 2.;
+		}
 	}
 	
 	object oldRightPaddle = rightPaddle;
 	rightPaddle.pos.y += rightPaddle.vel.y;
 	if(!rightPaddle.inBounds()) {
 		rightPaddle = oldRightPaddle;
+		if(rightPaddle.pos.y < 0.5) {
+			rightPaddle.pos.y = rightPaddle.dim.y / 2.;
+		} else {
+			rightPaddle.pos.y = 1. - rightPaddle.dim.y / 2.;
+		}
 	}
-	
 	
 	if(ball.pos.y >= 1 || ball.pos.y <= 0) {
 		ball.vel.y *= -1.f;
