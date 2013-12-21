@@ -35,13 +35,6 @@ void newGame() {
 	leftScore = rightScore = 0;
 }
 
-template<class T>
-string toString(const T& t) {
-	stringstream s;
-	s << t;
-	return s.str();
-}
-
 float limit(float x, float min, float max) {
 	if(x < min) {
 		return min;
