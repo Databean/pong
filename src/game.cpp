@@ -120,6 +120,10 @@ void movementLogic(bool keyboardState[256]) {
 		ball.vel.y = distr(randomgen);
 		ballDelay = getWallTime() + 0.75;
 	}
+	
+	if(keyboardState[27]) {
+		showMenu();
+	}
 }
 
 int stringWidth(const string& text) {

@@ -118,9 +118,10 @@ void reshape(int w, int h) {
 
 void keyboard(unsigned char key, int x, int y) {
 	keyboardState[key] = true;
+	/*
 	if(key == 27) { //Escape
 		glutLeaveMainLoop();
-	}
+	}*/
 }
 
 void keyboardUp(unsigned char key, int x, int y) {

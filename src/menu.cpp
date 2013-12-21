@@ -1,7 +1,11 @@
 #include "menu.h"
 
+#include <GL/freeglut.h>
+
 #include "pong.h"
 #include "image.h"
+
+enum { MAIN_MENU, MODE_MENU } menuScreen;
 
 GLuint menuBackground;
 GLuint playTexture;
@@ -33,7 +37,7 @@ object mediumButton;
 object hardButton;
 object extremeButton;
 
-int selected = 0;
+bool previousEscape = false;
 
 void initMenu() {
 	menuBackground = loadImage("resources/Menu.png");
@@ -60,12 +64,19 @@ void initMenu() {
 	modeButton = {{175/1280., 0.4}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, modeTexture};
 	optionButton= {{175/1280., 0.2}, {350./1280.,150./720.}, {0, 0}, {1, 1, 1}, optionTexture};
 	
-	difficultyText = {{0.5, 0.5}, {550/1280., 150/720.}, {0, 0}, {1, 1, 1}, difficultyTexture};
+	difficultyText = {{275/1280., 0.75}, {550/1280., 150/720.}, {0, 0}, {1, 1, 1}, difficultyTexture};
+	easyButton = {{175/1280., 0.6}, {350/1280., 150/720.}, {0, 0}, {1, 1, 1}, easyTexture};
+	mediumButton = {{425/1280., 0.6}, {350/1280., 150/720.}, {0, 0}, {1, 1, 1}, mediumTexture};
+	hardButton = {{750/1280., 0.6}, {350/1280., 150/720.}, {0, 0}, {1, 1, 1}, hardTexture};
+	extremeButton = {{1000/1280., 0.6}, {350/1280., 150/720.}, {0, 0}, {1, 1, 1}, extremeTexture};
 }
 
-void drawMenu(bool keyboardState[256]) {
-	
+void drawMainMenu(bool keyboardState[256]) {
 	static bool previousUp, previousDown;
+	
+	static int selected;
+	
+	bgObject.texture = menuBackground;
 	
 	if(keyboardState['w'] && !previousUp) {
 		selected = (selected + 3 - 1) % 3;
@@ -86,7 +97,60 @@ void drawMenu(bool keyboardState[256]) {
 	displayObject(modeButton);
 	displayObject(optionButton);
 	
-	if(selected == 0 && keyboardState[' ']) {
-		showGame();
+	if(keyboardState[' ']) {
+		if(selected == 0) {
+			showGame();
+		} else if(selected == 1) {
+			menuScreen = MODE_MENU;
+		}
+	} else if(keyboardState[27] && !previousEscape) { //Escape
+		glutLeaveMainLoop();
 	}
+}
+
+void drawModeMenu(bool keyboardState[256]) {
+	static bool previousLeft, previousRight;
+	
+	bgObject.texture = modeBackground;
+	
+	static int column = 0;
+	
+	if(keyboardState['a'] && !previousLeft) {
+		column = (column + 4 - 1) % 4;
+	}
+	if(keyboardState['d'] && !previousRight) {
+		column = (column + 1) % 4;
+	}
+	
+	previousLeft = keyboardState['a'];
+	previousRight = keyboardState['d'];
+	
+	easyButton.texture = column == 0 ? easySelectedTexture : easyTexture;
+	mediumButton.texture = column == 1 ? mediumSelectedTexture : mediumTexture;
+	hardButton.texture = column == 2 ? hardSelectedTexture : hardTexture;
+	extremeButton.texture = column == 3 ? extremeSelectedTexture : extremeTexture;
+	
+	displayObject(bgObject);
+	displayObject(difficultyText);
+	displayObject(easyButton);
+	displayObject(mediumButton);
+	displayObject(hardButton);
+	displayObject(extremeButton);
+	
+	if(keyboardState[27] && !previousEscape) { //Escape
+		menuScreen = MAIN_MENU;
+	}
+}
+
+void drawMenu(bool keyboardState[256]) {
+	switch(menuScreen) {
+		case MAIN_MENU:
+			drawMainMenu(keyboardState);
+			break;
+		case MODE_MENU:
+			drawModeMenu(keyboardState);
+			break;
+	}
+	
+	previousEscape = keyboardState[27];
 }
