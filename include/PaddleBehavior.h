@@ -9,7 +9,7 @@ protected:
 public:
 	PaddleBehavior(object& paddle);
 	PaddleBehavior(const PaddleBehavior&) = delete;
-	~PaddleBehavior();
+	virtual ~PaddleBehavior();
 	PaddleBehavior& operator=(const PaddleBehavior&) = delete;
 	
 	virtual void doMovement(bool keyboardState[256]) = 0;
@@ -22,7 +22,7 @@ private:
 public:
 	StandardPaddle(object& paddle, float speed);
 	StandardPaddle(const StandardPaddle&) = delete;
-	~StandardPaddle();
+	virtual ~StandardPaddle();
 	StandardPaddle& operator=(const StandardPaddle&) = delete;
 	
 	virtual void doMovement(bool keyboardState[256]);
@@ -38,7 +38,7 @@ private:
 public:
 	JumpPaddle(object& paddle, float speed, float dashSpeed);
 	JumpPaddle(const JumpPaddle&) = delete;
-	~JumpPaddle();
+	virtual ~JumpPaddle();
 	JumpPaddle& operator=(const JumpPaddle&) = delete;
 	
 	virtual void doMovement(bool keyboardState[256]);

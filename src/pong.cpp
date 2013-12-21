@@ -48,6 +48,7 @@ bool inGame = false;
 
 void showGame() {
 	inGame = true;
+	newGame();
 }
 
 void showMenu() {

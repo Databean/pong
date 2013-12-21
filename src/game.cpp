@@ -11,6 +11,7 @@
 #include "game.h"
 #include "PaddleBehavior.h"
 #include "image.h"
+#include "Settings.h"
 #include "util.h"
 
 using std::stringstream;
@@ -31,8 +32,28 @@ double ballDelay = getWallTime();
 
 int leftScore = 0, rightScore = 0;
 
+PaddleBehavior* leftPaddleBehavior = nullptr;
+PaddleBehavior* rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
+
 void newGame() {
 	leftScore = rightScore = 0;
+	if(leftPaddleBehavior) {
+		delete leftPaddleBehavior;
+	}
+	leftPaddleBehavior = new JumpPaddle(leftPaddle, 0.01, 0.06);
+	if(rightPaddleBehavior) {
+		delete rightPaddleBehavior;
+	}
+	const string& difficulty = settings.get("difficulty","medium");
+	if(difficulty == "easy") {
+		rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.008, 0.05);
+	} else if(difficulty == "hard") {
+		rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.012, 0.07);
+	} else if(difficulty == "extreme") {
+		rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.014, 0.08);
+	} else {
+		rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
+	}
 }
 
 float limit(float x, float min, float max) {
@@ -44,9 +65,6 @@ float limit(float x, float min, float max) {
 		return x;
 	}
 }
-
-PaddleBehavior* leftPaddleBehavior = new JumpPaddle(leftPaddle, 0.01, 0.06);
-PaddleBehavior* rightPaddleBehavior = new JumpPaddle(rightPaddle, 0.01, 0.06);
 
 void initGame() {
 	backgroundTexture = loadImage("resources/NeonVariant.png");
