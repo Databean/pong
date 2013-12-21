@@ -4,6 +4,9 @@
 
 #include "pong.h"
 #include "image.h"
+#include "Settings.h"
+
+using std::string;
 
 enum { MAIN_MENU, MODE_MENU } menuScreen;
 
@@ -115,11 +118,34 @@ void drawModeMenu(bool keyboardState[256]) {
 	
 	static int column = 0;
 	
+	const string& difficulty = settings.get("difficulty","medium");
+	if(difficulty == "easy") {
+		column = 0;
+	} else if(difficulty == "medium") {
+		column = 1;
+	} else if(difficulty == "hard") {
+		column = 2;
+	} else if(difficulty == "extreme") {
+		column = 3;
+	} else {
+		column = 1;
+	}
+	
 	if(keyboardState['a'] && !previousLeft) {
 		column = (column + 4 - 1) % 4;
 	}
 	if(keyboardState['d'] && !previousRight) {
 		column = (column + 1) % 4;
+	}
+	
+	if(column == 0) {
+		settings.set("difficulty", "easy");
+	} else if(column == 1) {
+		settings.set("difficulty", "medium");
+	} else if(column == 2) {
+		settings.set("difficulty", "hard");
+	} else if(column == 3) {
+		settings.set("difficulty", "extreme");
 	}
 	
 	previousLeft = keyboardState['a'];

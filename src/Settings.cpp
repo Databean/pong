@@ -14,7 +14,7 @@ using std::getline;
 Settings settings("settings.txt");
 
 Settings::Settings(const std::string& filename) : filename(filename), data() {
-	
+	read();
 }
 
 Settings::Settings(const Settings& s) : filename(s.filename), data(s.data) {
@@ -54,7 +54,7 @@ void Settings::write() const {
 }
 
 const string& Settings::get(const string& key, const string& defaultValue) {
-	read();
+	//read();
 	if(data.count(key)) {
 		return data[key];
 	} else {
