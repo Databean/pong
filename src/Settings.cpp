@@ -33,14 +33,16 @@ Settings& Settings::operator=(const Settings& s) {
 
 void Settings::read() {
 	fstream file(filename, fstream::in);
-	data.clear();
-	while(!file.eof()) {
-		string key;
-		string value;
-		getline(file, key, '=');
-		if(key != "") {
-			getline(file, value);
-			data[key] = value;
+	if(file) {
+		data.clear();
+		while(!file.eof()) {
+			string key;
+			string value;
+			getline(file, key, '=');
+			if(key != "") {
+				getline(file, value);
+				data[key] = value;
+			}
 		}
 	}
 }

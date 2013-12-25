@@ -76,13 +76,13 @@ void displayObject(const object& o) {
 	} glEnd();
 }
 
-double lastFrame = getWallTime();
 
 void display() {
-	
 	//Clear screen
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	static double lastFrame = getWallTime();
 	
 	if(inGame) {
 		if(getWallTime() - lastFrame >= 1.0 / 65) {
@@ -153,6 +153,7 @@ int main(int argc, char** argv) {
 	glutKeyboardUpFunc(keyboardUp);
 	glutSpecialFunc(keyboardSpecial);
 	glutSpecialUpFunc(keyboardSpecialUp);
+	
 	glutMainLoop();
 	return 0;
 }
