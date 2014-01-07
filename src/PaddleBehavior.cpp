@@ -16,6 +16,10 @@ PaddleBehavior::~PaddleBehavior() {
 	
 }
 
+object& PaddleBehavior::getPaddle() {
+	return paddle;
+}
+
 StandardPaddle::StandardPaddle(object& paddle, float speed) : PaddleBehavior(paddle), speed(speed) {
 	
 }

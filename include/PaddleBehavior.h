@@ -12,6 +12,7 @@ public:
 	virtual ~PaddleBehavior();
 	PaddleBehavior& operator=(const PaddleBehavior&) = delete;
 	
+	object& getPaddle();
 	virtual void doMovement(bool keyboardState[256]) = 0;
 	virtual void doAI(const object& ball) = 0;
 };

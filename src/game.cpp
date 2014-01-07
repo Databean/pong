@@ -7,19 +7,23 @@
 #include <algorithm>
 #include <sstream>
 #include <ctime>
+#include <vector>
 
 #include "game.h"
 #include "PaddleBehavior.h"
 #include "image.h"
 #include "Settings.h"
 #include "util.h"
+#include "Powerup.h"
 
-using std::stringstream;
 using std::string;
+using std::vector;
+using std::unique_ptr;
 
-std::mt19937 rd;
-std::mt19937 randomgen(rd());
+std::mt19937 rd2;
+std::mt19937 randm(rd2());
 std::uniform_real_distribution<float> distr(-.005,.005);
+std::uniform_int_distribution<int> powerupDistr(0, 200);
 
 GLuint backgroundTexture;
 GLuint numberTextures[10];
@@ -27,6 +31,8 @@ GLuint numberTextures[10];
 object leftPaddle = {{0.05,0.5}, {0.01, 0.1}, {0, 0}, {0., 1., 0.}, 0};
 object rightPaddle = {{0.95,0.5}, {0.01, 0.1}, {0, 0}, {1., 0., 0.}, 0};
 object ball = {{0.5, 0.5}, {0.01, 0.01}, {0.008, 0.}, {1., 1., 1.}, 0};
+
+vector<unique_ptr<Powerup>> activePowerups;
 
 double ballDelay = getWallTime();
 
@@ -79,6 +85,19 @@ void movementLogic(bool keyboardState[256]) {
 		ball.pos.y += ball.vel.y;
 	}
 	
+	for(auto it = activePowerups.begin(); it != activePowerups.end();) {
+		if((*it)->isColliding(ball)) {
+			(*it)->trigger(*leftPaddleBehavior, *rightPaddleBehavior, ball);
+			it = activePowerups.erase(it);
+		} else {
+			it++;
+		}
+	}
+	
+	if(powerupDistr(randm) == 0) {
+		activePowerups.push_back(randomPowerup());
+	}
+	
 	leftPaddleBehavior->doMovement(keyboardState);
 	
 	rightPaddleBehavior->doAI(ball);
@@ -128,7 +147,7 @@ void movementLogic(bool keyboardState[256]) {
 	if(restart) {
 		ball.pos.x = 0.5;
 		ball.pos.y = 0.5;
-		ball.vel.y = distr(randomgen);
+		ball.vel.y = distr(randm);
 		ballDelay = getWallTime() + 0.75;
 	}
 	
@@ -180,7 +199,7 @@ void displayScores(int leftScore, int rightScore) {
 
 void drawGame() {
 	
-	
+	glColor3f(1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, backgroundTexture);
 	glBegin(GL_QUADS);
 	glTexCoord2i(0, 0); glVertex2i(0, 0);
@@ -195,4 +214,7 @@ void drawGame() {
 	displayObject(rightPaddle);
 	displayObject(ball);
 	displayScores(leftScore, rightScore);
+	for(unique_ptr<Powerup>& powerup : activePowerups) {
+		powerup->draw();
+	}
 }
